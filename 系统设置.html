@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>系统设置</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+  <div class="max-w-xl mx-auto bg-white rounded p-6 shadow">
+    <h1 class="text-xl font-bold mb-4">系统设置</h1>
+
+    <label class="block mb-2 font-medium">系统名称</label>
+    <input class="w-full border px-3 py-2 rounded mb-4" value="超市进销存管理系统">
+
+    <label class="block mb-2 font-medium">公司名称</label>
+    <input class="w-full border px-3 py-2 rounded mb-4" value="示例超市有限公司">
+
+    <label class="block mb-2 font-medium">系统版本</label>
+    <input class="w-full border px-3 py-2 rounded mb-4 bg-gray-100" readonly value="v3.2.0">
+
+    <label class="flex items-center mb-4">
+      <input type="checkbox" class="mr-2" checked>
+      <span>启用邮件通知</span>
+    </label>
+
+    <div class="flex justify-end">
+      <button class="px-4 py-2 bg-blue-600 text-white rounded">保存</button>
+    </div>
+  </div>
+</body>
+</html>

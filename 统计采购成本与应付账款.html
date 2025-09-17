@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>采购成本与应付账款统计</title>
+<style>
+    body{font-family:"微软雅黑";background:#f5f5f5;margin:0;padding:20px}
+    .box{width:900px;margin:0 auto;background:#fff;padding:20px;border:1px solid #ddd}
+    h2{margin:0 0 10px;font-size:18px}
+    .filter{margin-bottom:10px;font-size:14px}
+    .filter input,.filter select{padding:5px;margin-right:6px;border:1px solid #ccc}
+    .filter button{padding:5px 10px;background:#2c7eda;color:#fff;border:none;cursor:pointer}
+    .summary{margin-bottom:10px;font-size:14px;font-weight:bold}
+    table{width:100%;border-collapse:collapse;font-size:14px;margin-top:10px}
+    th,td{border:1px solid #ddd;padding:6px;text-align:center}
+    th{background:#f0f0f0}
+    .number{text-align:right}
+    .btn-pay{padding:3px 8px;background:#5cb85c;color:#fff;border:none;cursor:pointer;font-size:12px}
+</style>
+</head>
+<body>
+<div class="box">
+    <h2>采购成本与应付账款统计</h2>
+    <div class="filter">
+        起始日期：<input type="date" id="startDate" value="2024-01-01">
+        结束日期：<input type="date" id="endDate" value="2024-12-31">
+        供应商：
+        <input id="supplier">
+        <button onclick="genReport()">生成统计</button>
+    </div>
+
+    <!-- 汇总 -->
+    <div class="summary" id="summary"></div>
+
+    <!-- 明细表 -->
+    <table id="detailTable">
+        <thead>
+            <tr>
+                <th>订单编号</th>
+                <th>供应商</th>
+                <th>订单日期</th>
+                <th>采购总额(元)</th>
+                <th>已付金额(元)</th>
+                <th>应付余额(元)</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<script>
+// 模拟采购数据
+var purchaseData = [
+    {orderNo:"PO-2024-001",supplier:"北京科技有限公司",orderDate:"2024-06-01",total:18200,paid:10000},
+    {orderNo:"PO-2024-002",supplier:"广州电子有限公司",orderDate:"2024-06-05",total:32800,paid:30000},
+    {orderNo:"PO-2024-003",supplier:"上海贸易公司",orderDate:"2024-06-10",total:15600,paid:0}
+];
+
+// 生成统计
+function genReport(){
+    var start = document.getElementById("startDate").value;
+    var end = document.getElementById("endDate").value;
+    var supplier = document.getElementById("supplier").value;
+
+    if(!start||!end){alert("请选择日期范围");return;}
+
+    // 过滤
+    var list = [];
+    for(var i=0;i<purchaseData.length;i++){
+        var d = purchaseData[i];
+        if(d.orderDate>=start&&d.orderDate<=end){
+            if(supplier===""||d.supplier===supplier){
+                list.push(d);
+            }
+        }
+    }
+
+    // 计算汇总
+    var totalPurchase = 0;
+    var totalPaid = 0;
+    var totalPayable = 0;
+    for(var i=0;i<list.length;i++){
+        totalPurchase += list[i].total;
+        totalPaid += list[i].paid;
+        totalPayable += (list[i].total - list[i].paid);
+    }
+
+    // 显示汇总
+    document.getElementById("summary").innerHTML = 
+        "采购总额：<span style='color:red'>"+totalPurchase.toFixed(2)+"</span> 元， "+
+        "已付金额：<span style='color:green'>"+totalPaid.toFixed(2)+"</span> 元， "+
+        "应付余额：<span style='color:orange;font-weight:bold'>"+totalPayable.toFixed(2)+"</span> 元";
+
+    // 显示明细
+    var tb = document.querySelector("#detailTable tbody");
+    tb.innerHTML = "";
+    for(var i=0;i<list.length;i++){
+        var d=list[i];
+        var balance = d.total - d.paid;
+        var tr=document.createElement("tr");
+        tr.innerHTML=
+            "<td>"+d.orderNo+"</td>"+
+            "<td>"+d.supplier+"</td>"+
+            "<td>"+d.orderDate+"</td>"+
+            "<td class='number'>"+d.total.toFixed(2)+"</td>"+
+            "<td class='number'>"+d.paid.toFixed(2)+"</td>"+
+            "<td class='number' style='color:"+(balance>0?"red":"green")+"'>"+balance.toFixed(2)+"</td>"+
+            "<td>"+(balance>0?"<button class='btn-pay' onclick='payNow(\\'"+d.orderNo+"\\')'>付款</button>":"已结清")+"</td>";
+        tb.appendChild(tr);
+    }
+}
+
+// 模拟付款
+function payNow(orderNo){
+    alert("正在打开付款界面，订单："+orderNo);
+}
+
+// 初始加载
+genReport();
+</script>
+</body>
+</html>

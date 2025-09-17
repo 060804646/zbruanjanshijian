@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>商品入库/出库明细</title>
+    <style>
+        body{font-family:"微软雅黑";background:#f5f5f5;margin:0;padding:20px}
+        .box{width:900px;margin:0 auto;background:#fff;padding:20px;border:1px solid #ddd}
+        h2{margin:0 0 15px;font-size:20px;color:#333}
+        .tabs{margin-bottom:15px}
+        .tabs button{padding:8px 15px;margin-right:6px;border:1px solid #ccc;background:#f0f0f0;cursor:pointer;font-size:14px}
+        .tabs button.active{background:#2c7eda;color:#fff;border-color:#2c7eda}
+        .form-row{margin-bottom:12px;font-size:14px}
+        .form-row label{display:inline-block;width:90px;text-align:right;margin-right:6px}
+        .form-row input,.form-row select{padding:5px;border:1px solid #ccc;width:160px}
+        table{width:100%;border-collapse:collapse;font-size:14px;margin-top:10px}
+        th,td{border:1px solid #ddd;padding:6px;text-align:center}
+        th{background:#f7f7f7}
+        .btn-add{padding:6px 12px;background:#2c7eda;color:#fff;border:none;cursor:pointer;margin-left:96px}
+        .btn-save{padding:4px 10px;background:#5cb85c;color:#fff;border:none;cursor:pointer;font-size:12px}
+        .btn-del{padding:4px 10px;background:#d9534f;color:#fff;border:none;cursor:pointer;font-size:12px}
+        .hide{display:none}
+    </style>
+</head>
+<body>
+<div class="box">
+    <h2>商品入库/出库明细</h2>
+    <div class="tabs">
+        <button class="active" onclick="switchTab('in')">采购入库</button>
+        <button onclick="switchTab('return')">退货入库</button>
+        <button onclick="switchTab('out')">销售出库</button>
+        <button onclick="switchTab('loss')">报损出库</button>
+    </div>
+
+    <!-- 采购入库 -->
+    <div id="in" class="tab-pane">
+        <form onsubmit="return addRecord('in')">
+            <div class="form-row">
+                <label>订单编号：</label>
+                <input type="text" name="orderNo" required>
+                <label>商品名称：</label>
+                <input type="text" name="product" required>
+            </div>
+            <div class="form-row">
+                <label>数量：</label>
+                <input type="number" min="1" name="qty" required>
+                <label>单价：</label>
+                <input type="number" step="0.01" min="0" name="price" required>
+            </div>
+            <div class="form-row">
+                <label>供应商：</label>
+                <input type="text" name="supplier" required>
+                <label>日期：</label>
+                <input type="date" name="date" required>
+            </div>
+            <button type="submit" class="btn-add">添加入库记录</button>
+        </form>
+        <table>
+            <thead><tr><th>订单编号</th><th>商品名称</th><th>数量</th><th>单价</th><th>供应商</th><th>日期</th><th>操作</th></tr></thead>
+            <tbody id="inList"></tbody>
+        </table>
+    </div>
+
+    <!-- 退货入库 -->
+    <div id="return" class="tab-pane hide">
+        <form onsubmit="return addRecord('return')">
+            <div class="form-row">
+                <label>退货单号：</label>
+                <input type="text" name="orderNo" required>
+                <label>商品名称：</label>
+                <input type="text" name="product" required>
+            </div>
+            <div class="form-row">
+                <label>数量：</label>
+                <input type="number" min="1" name="qty" required>
+                <label>单价：</label>
+                <input type="number" step="0.01" min="0" name="price" required>
+            </div>
+            <div class="form-row">
+                <label>客户：</label>
+                <input type="text" name="customer" required>
+                <label>日期：</label>
+                <input type="date" name="date" required>
+            </div>
+            <button type="submit" class="btn-add">添加退货记录</button>
+        </form>
+        <table>
+            <thead><tr><th>退货单号</th><th>商品名称</th><th>数量</th><th>单价</th><th>客户</th><th>日期</th><th>操作</th></tr></thead>
+            <tbody id="returnList"></tbody>
+        </table>
+    </div>
+
+    <!-- 销售出库 -->
+    <div id="out" class="tab-pane hide">
+        <form onsubmit="return addRecord('out')">
+            <div class="form-row">
+                <label>销售单号：</label>
+                <input type="text" name="orderNo" required>
+                <label>商品名称：</label>
+                <input type="text" name="product" required>
+            </div>
+            <div class="form-row">
+                <label>数量：</label>
+                <input type="number" min="1" name="qty" required>
+                <label>单价：</label>
+                <input type="number" step="0.01" min="0" name="price" required>
+            </div>
+            <div class="form-row">
+                <label>客户：</label>
+                <input type="text" name="customer" required>
+                <label>日期：</label>
+                <input type="date" name="date" required>
+            </div>
+            <button type="submit" class="btn-add">添加销售出库</button>
+        </form>
+        <table>
+            <thead><tr><th>销售单号</th><th>商品名称</th><th>数量</th><th>单价</th><th>客户</th><th>日期</th><th>操作</th></tr></thead>
+            <tbody id="outList"></tbody>
+        </table>
+    </div>
+
+    <!-- 报损出库 -->
+    <div id="loss" class="tab-pane hide">
+        <form onsubmit="return addRecord('loss')">
+            <div class="form-row">
+                <label>报损单号：</label>
+                <input type="text" name="orderNo" required>
+                <label>商品名称：</label>
+                <input type="text" name="product" required>
+            </div>
+            <div class="form-row">
+                <label>数量：</label>
+                <input type="number" min="1" name="qty" required>
+                <label>原因：</label>
+                <input type="text" name="reason" required>
+            </div>
+            <div class="form-row">
+                <label>责任人：</label>
+                <input type="text" name="resp" required>
+                <label>日期：</label>
+                <input type="date" name="date" required>
+            </div>
+            <button type="submit" class="btn-add">添加报损记录</button>
+        </form>
+        <table>
+            <thead><tr><th>报损单号</th><th>商品名称</th><th>数量</th><th>原因</th><th>责任人</th><th>日期</th><th>操作</th></tr></thead>
+            <tbody id="lossList"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+const today = new Date().toISOString().slice(0,10);
+document.querySelectorAll('input[name="date"]').forEach(i=>i.value=today);
+
+function switchTab(type){
+    document.querySelectorAll('.tab-pane').forEach(p=>p.classList.add('hide'));
+    document.getElementById(type).classList.remove('hide');
+    document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('active'));
+    event.target.classList.add('active');
+}
+
+function addRecord(type){
+    const form = event.target;
+    const data = new FormData(form);
+    const row = document.createElement('tr');
+
+    let cells = [];
+
+    if (type === 'loss') {
+        cells = [
+            data.get('orderNo'),
+            data.get('product'),
+            data.get('qty'),
+            data.get('reason'),
+            data.get('resp'),
+            data.get('date'),
+            `<button class="btn-del" onclick="this.parentNode.parentNode.remove()">删除</button>`
+        ];
+    } else {
+        cells = [
+            data.get('orderNo'),
+            data.get('product'),
+            data.get('qty'),
+            '¥' + parseFloat(data.get('price')).toFixed(2),
+            data.get(type === 'in' ? 'supplier' : 'customer'),
+            data.get('date'),
+            `<button class="btn-del" onclick="this.parentNode.parentNode.remove()">删除</button>`
+        ];
+    }
+
+    cells.forEach(c => {
+        const td = document.createElement('td');
+        td.innerHTML = c;
+        row.appendChild(td);
+    });
+
+    document.getElementById(type + 'List').appendChild(row);
+    form.reset();
+    form.date.value = today;
+    return false;
+}
+</script>
+</body>
+</html>

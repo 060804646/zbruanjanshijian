@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>数据分析 - 销售排行与库存周转率</title>
+<style>
+    body{font-family:"微软雅黑";background:#f5f5f5;margin:0;padding:20px}
+    .box{width:900px;margin:0 auto;background:#fff;padding:20px;border:1px solid #ddd}
+    h2{margin:0 0 10px;font-size:18px}
+    .tabs{margin-bottom:10px}
+    .tabs button{padding:6px 15px;margin-right:5px;border:1px solid #ccc;background:#f0f0f0;cursor:pointer;font-size:14px}
+    .tabs button.active{background:#2c7eda;color:#fff;border-color:#2c7eda}
+    .pane{display:none}
+    .pane.active{display:block}
+    .filter{margin-bottom:10px;font-size:14px}
+    .filter input{padding:5px;margin-right:6px;border:1px solid #ccc}
+    .filter button{padding:5px 10px;background:#2c7eda;color:#fff;border:none;cursor:pointer}
+    table{width:100%;border-collapse:collapse;font-size:14px;margin-top:10px}
+    th,td{border:1px solid #ddd;padding:6px;text-align:center}
+    th{background:#f0f0f0}
+    .number{text-align:right}
+    .rate{color:#d68900;font-weight:bold}
+</style>
+</head>
+<body>
+<div class="box">
+    <h2>数据分析</h2>
+    <div class="tabs">
+        <button class="active" onclick="switchTab('sales')">商品销售排行</button>
+        <button onclick="switchTab('turnover')">库存周转率</button>
+    </div>
+
+    <!-- 1. 销售排行 -->
+    <div id="sales" class="pane active">
+        <div class="filter">
+            时间维度：
+            <select id="salesDim" onchange="loadSales()">
+                <option value="day">每日</option>
+                <option value="week">每周</option>
+                <option value="month">每月</option>
+                <option value="year">每年</option>
+            </select>
+            <button onclick="loadSales()">刷新排行</button>
+        </div>
+        <table id="salesTable">
+            <thead>
+                <tr><th>排名</th><th>商品编码</th><th>商品名称</th><th>销售数量</th><th>销售金额(元)</th></tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <!-- 2. 库存周转率 -->
+    <div id="turnover" class="pane">
+        <div class="filter">
+            年份：
+            <select id="year" onchange="loadTurnover()">
+                <option value="2024">2024</option>
+                <option value="2023">2023</option>
+            </select>
+            <button onclick="loadTurnover()">计算周转率</button>
+        </div>
+        <table id="turnoverTable">
+            <thead>
+                <tr><th>商品编码</th><th>商品名称</th><th>年销售成本(元)</th><th>平均库存余额(元)</th><th>库存周转率</th></tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+// 切换页签
+function switchTab(tab){
+    var panes = document.querySelectorAll(".pane");
+    for(var i=0;i<panes.length;i++) panes[i].classList.remove("active");
+    document.getElementById(tab).classList.add("active");
+}
+
+// 加载销售排行
+function loadSales(){
+    var dim = document.getElementById("salesDim").value;
+    // 模拟数据
+    var data = [];
+    if(dim==="day") data=[{code:"P001",name:"台式电脑",qty:10,amount:36000},{code:"P002",name:"激光打印机",qty:8,amount:24000},{code:"P003",name:"无线鼠标",qty:200,amount:6000}];
+    if(dim==="week") data=[{code:"P001",name:"台式电脑",qty:70,amount:252000},{code:"P002",name:"激光打印机",qty:56,amount:168000},{code:"P003",name:"无线鼠标",qty:1400,amount:42000}];
+    if(dim==="month") data=[{code:"P001",name:"台式电脑",qty:300,amount:1080000},{code:"P002",name:"激光打印机",qty:240,amount:720000},{code:"P003",name:"无线鼠标",qty:6000,amount:180000}];
+    if(dim==="year") data=[{code:"P001",name:"台式电脑",qty:3600,amount:12960000},{code:"P002",name:"激光打印机",qty:2880,amount:8640000},{code:"P003",name:"无线鼠标",qty:72000,amount:2160000}];
+
+    var tb = document.querySelector("#salesTable tbody");
+    tb.innerHTML = "";
+    for(var i=0;i<data.length;i++){
+        var tr=document.createElement("tr");
+        tr.innerHTML=
+            "<td>"+(i+1)+"</td>"+
+            "<td>"+data[i].code+"</td>"+
+            "<td>"+data[i].name+"</td>"+
+            "<td>"+data[i].qty+"</td>"+
+            "<td class='number'>"+data[i].amount.toFixed(2)+"</td>";
+        tb.appendChild(tr);
+    }
+}
+
+// 加载库存周转率
+function loadTurnover(){
+    var year = document.getElementById("year").value;
+    // 模拟数据：年销售成本 & 平均库存余额
+    var data = [
+        {code:"P001",name:"台式电脑",cost:10800000,avgInventory:1800000},
+        {code:"P002",name:"激光打印机",cost:8640000,avgInventory:1200000},
+        {code:"P003",name:"无线鼠标",cost:2160000,avgInventory:300000}
+    ];
+
+    var tb = document.querySelector("#turnoverTable tbody");
+    tb.innerHTML = "";
+    for(var i=0;i<data.length;i++){
+        var d=data[i];
+        var rate = (d.cost / d.avgInventory).toFixed(2);
+        var tr=document.createElement("tr");
+        tr.innerHTML=
+            "<td>"+d.code+"</td>"+
+            "<td>"+d.name+"</td>"+
+            "<td class='number'>"+d.cost.toFixed(2)+"</td>"+
+            "<td class='number'>"+d.avgInventory.toFixed(2)+"</td>"+
+            "<td class='rate'>"+rate+" 次/年</td>";
+        tb.appendChild(tr);
+    }
+}
+
+// 初始加载
+loadSales();
+loadTurnover();
+</script>
+</body>
+</html>

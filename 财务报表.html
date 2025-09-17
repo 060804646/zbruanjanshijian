@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>财务报表</title>
+<style>
+    body{font-family:"微软雅黑";background:#f5f5f5;margin:0;padding:20px}
+    .box{width:900px;margin:0 auto;background:#fff;padding:20px;border:1px solid #ddd}
+    h2{margin:0 0 10px;font-size:18px}
+    .tabs{margin-bottom:10px}
+    .tabs button{padding:6px 15px;margin-right:5px;border:1px solid #ccc;background:#f0f0f0;cursor:pointer;font-size:14px}
+    .tabs button.active{background:#2c7eda;color:#fff;border-color:#2c7eda}
+    .pane{display:none}
+    .pane.active{display:block}
+    .row{margin-bottom:8px;font-size:14px}
+    .row label{display:inline-block;width:90px;text-align:right;margin-right:6px}
+    .row input{padding:5px;border:1px solid #ccc;width:140px}
+    .row button{padding:5px 10px;background:#2c7eda;color:#fff;border:none;cursor:pointer;margin-left:6px}
+    table{width:100%;border-collapse:collapse;font-size:14px;margin-top:10px}
+    th,td{border:1px solid #ddd;padding:6px;text-align:center}
+    th{background:#f0f0f0}
+    .number{text-align:right}
+    .btn-down{padding:4px 8px;background:#5cb85c;color:#fff;border:none;cursor:pointer;font-size:12px}
+</style>
+</head>
+<body>
+<div class="box">
+    <h2>财务报表</h2>
+    <div class="tabs">
+        <button class="active" onclick="switchTab('profit')">利润表</button>
+        <button onclick="switchTab('cash')">收支明细表</button>
+    </div>
+
+    <!-- 利润表 -->
+    <div id="profit" class="pane active">
+        <div class="row">
+            <label>起始日期：</label>
+            <input type="date" id="pStart" value="2024-01-01">
+            <label>结束日期：</label>
+            <input type="date" id="pEnd" value="2024-12-31">
+            <button onclick="genProfit()">生成利润表</button>
+        </div>
+        <table id="profitTable">
+            <thead>
+                <tr><th>项目</th><th>金额(元)</th><th>备注</th></tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <!-- 收支明细表 -->
+    <div id="cash" class="pane">
+        <div class="row">
+            <label>起始日期：</label>
+            <input type="date" id="cStart" value="2024-01-01">
+            <label>结束日期：</label>
+            <input type="date" id="cEnd" value="2024-12-31">
+            <button onclick="genCash()">生成明细表</button>
+        </div>
+        <table id="cashTable">
+            <thead>
+                <tr><th>日期</th><th>摘要</th><th>收入(元)</th><th>支出(元)</th><th>余额(元)</th></tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+// 切换页签
+function switchTab(tab){
+    var panes = document.querySelectorAll(".pane");
+    for(var i=0;i<panes.length;i++) panes[i].classList.remove("active");
+    document.getElementById(tab).classList.add("active");
+}
+
+// 生成利润表
+function genProfit(){
+    var start = document.getElementById("pStart").value;
+    var end   = document.getElementById("pEnd").value;
+    if(!start||!end){alert("请选择日期范围");return;}
+
+    // 模拟数据
+    var revenue = 1250000;
+    var cost    = 750000;
+    var expense = 180000;
+    var profit  = revenue - cost - expense;
+
+    var tb = document.querySelector("#profitTable tbody");
+    tb.innerHTML = 
+        '<tr><td>营业收入</td><td class="number">'+revenue.toFixed(2)+'</td><td>商品销售总额</td></tr>'+
+        '<tr><td>营业成本</td><td class="number">'+cost.toFixed(2)+'</td><td>采购+物流成本</td></tr>'+
+        '<tr><td>营业费用</td><td class="number">'+expense.toFixed(2)+'</td><td>人工+房租+水电</td></tr>'+
+        '<tr style="font-weight:bold"><td>净利润</td><td class="number">'+profit.toFixed(2)+'</td><td>收入-成本-费用</td></tr>';
+}
+
+// 生成收支明细表
+function genCash(){
+    var start = document.getElementById("cStart").value;
+    var end   = document.getElementById("cEnd").value;
+    if(!start||!end){alert("请选择日期范围");return;}
+
+    // 模拟流水
+    var list = [
+        {date:"2024-06-01",desc:"销售货款",in:50000,out:0},
+        {date:"2024-06-02",desc:"采购付款",in:0,out:30000},
+        {date:"2024-06-03",desc:"房租",in:0,out:8000},
+        {date:"2024-06-04",desc:"水电费",in:0,out:1200},
+        {date:"2024-06-05",desc:"销售货款",in:35000,out:0}
+    ];
+
+    var balance = 0;
+    var tb = document.querySelector("#cashTable tbody");
+    tb.innerHTML = "";
+    for(var i=0;i<list.length;i++){
+        var item = list[i];
+        balance += item.in - item.out;
+        var tr = document.createElement("tr");
+        tr.innerHTML = 
+            '<td>'+item.date+'</td>'+
+            '<td>'+item.desc+'</td>'+
+            '<td class="number">'+item.in.toFixed(2)+'</td>'+
+            '<td class="number">'+item.out.toFixed(2)+'</td>'+
+            '<td class="number">'+balance.toFixed(2)+'</td>';
+        tb.appendChild(tr);
+    }
+}
+</script>
+</body>
+</html>

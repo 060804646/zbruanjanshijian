@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>超市进销存管理系统</title>
+  <!-- 引入外部资源 -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+  
+  <!-- Tailwind 配置 -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#165DFF',
+            secondary: '#0FC6C2',
+            success: '#00B42A',
+            warning: '#FF7D00',
+            danger: '#F53F3F',
+            info: '#86909C',
+            sidebar: '#1D2129',
+            'sidebar-active': '#0A84FF',
+            'card-bg': '#FFFFFF',
+            'page-bg': '#F2F3F5',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .sidebar-item {
+        @apply flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-sidebar-active/20 hover:text-white transition-all duration-200 cursor-pointer;
+      }
+      .sidebar-item.active {
+        @apply bg-sidebar-active/20 text-white border-l-4 border-sidebar-active;
+      }
+      .stat-card {
+        @apply bg-white rounded-lg shadow-sm p-5 transition-all duration-300 hover:shadow-md;
+      }
+      .quick-btn {
+        @apply flex flex-col items-center justify-center p-4 rounded-lg bg-white shadow-sm transition-all duration-300 hover:shadow-md hover:translate-y-[-2px] cursor-pointer;
+      }
+      .announcement-item {
+        @apply py-3 border-b border-gray-100 last:border-0 hover:bg-gray-50 px-2 rounded transition-colors duration-200;
+      }
+    }
+  </style>
+</head>
+<body class="bg-page-bg text-gray-800 min-h-screen flex overflow-hidden">
+  <!-- 侧边栏 -->
+  <aside class="bg-sidebar w-64 flex-shrink-0 hidden md:flex flex-col h-screen transition-all duration-300 ease-in-out z-20">
+    <!-- 品牌标识 -->
+    <div class="h-16 flex items-center px-4 border-b border-gray-700/50">
+      <div class="text-white font-bold text-xl flex items-center gap-2">
+        <i class="fa fa-cubes text-primary"></i>
+        <span>管理系统</span>
+      </div>
+    </div>
+    
+    <!-- 菜单列表 -->
+    <div class="flex-1 overflow-y-auto py-4">
+      <div class="px-4 text-xs text-gray-400 uppercase mb-2">主菜单</div>
+      
+      <div class="sidebar-item" >
+        <i class="fa fa-home w-5 text-center"></i>
+        <span>首页</span>
+      </div>
+      
+      <!-- 采购管理模块 -->
+      <div class="sidebar-item active" >
+        <i class="fa fa-shopping-cart w-5 text-center"></i>
+        <span>采购管理</span>
+        <i class="fa fa-angle-down ml-auto transition-transform duration-200 transform rotate-180"></i>
+      </div>
+      <div class="pl-12">
+        <div class="sidebar-item py-2 text-sm" onclick="window.location.href='生成采购订单.html'">生成采购订单</div>
+        <div class="sidebar-item py-2 text-sm" onclick="window.location.href='page/跟踪订单状态.html'">跟踪订单状态</div>
+        <div class="sidebar-item py-2 text-sm" onclick="window.location.href='录入供应商信息.html'">录入供应商信息</div>
+      </div>
+      
+      <!-- 库存管理模块 -->
+      <div class="sidebar-item" >
+        <i class="fa fa-archive w-5 text-center"></i>
+        <span>库存管理</span>
+        <i class="fa fa-angle-down ml-auto"></i>
+      </div>
+      <div class="pl-12 hidden">
+        <div class="sidebar-item py-2 text-sm" onclick="window.location.href='商品入库、出库明细.html'">商品入库、出库明细</div>
+        <div class="sidebar-item py-2 text-sm" onclick="window.location.href='库存盘点.html'">库存盘点</div>
+        <div class="sidebar-item py-2 text-sm" onclick="window.location.href='库存预警.html'">库存预警</div>
+      </div>
+      
+      <!-- 销售管理模块 -->
+      <div class="sidebar-item" >
+        <i class="fa fa-line-chart w-5 text-center"></i>
+        <span>销售管理</span>
+        <i class="fa fa-angle-down ml-auto"></i>
+      </div>
+      <div class="pl-12 hidden">
+        <div class="sidebar-item py-2 text-sm" onclick="window.location.href='销售订单.html'">销售订单</div>
+        <div class="sidebar-item py-2 text-sm" onclick="window.location.href='page/退货退款功能.html'">处理退货、退款</div>
+        <div class="sidebar-item py-2 text-sm" onclick="window.location.href='客户信息.html'">客户信息</div>
+      </div>
+      
+      <!-- 商品管理模块  -->
+      <div class="sidebar-item" >
+        <i class="fa fa-tags w-5 text-center"></i>
+        <span onclick="window.location.href='page/商品管理模块.html'">商品管理</span>
+      </div>
+      
+      <!-- 财务管理模块 -->
+      <div class="sidebar-item" >
+        <i class="fa fa-money w-5 text-center"></i>
+        <span>财务管理</span>
+        <i class="fa fa-angle-down ml-auto"></i>
+      </div>
+      <div class="pl-12 hidden">
+        <div class="sidebar-item py-2 text-sm" onclick="window.location.href='财务报表.html'">财务报表</div>
+        <div class="sidebar-item py-2 text-sm" onclick="window.location.href='日常费用.html'">日常费用</div>
+        <div class="sidebar-item py-2 text-sm" onclick="window.location.href='统计采购成本与应付账款.html'">统计采购成本与应付账款</div>
+      </div>
+      
+      <!-- 数据分析模块 -->
+      <div class="sidebar-item" >
+        <i class="fa fa-bar-chart w-5 text-center"></i>
+        <span onclick="window.location.href='数据分析.html'">数据分析</span>
+      </div>
+      
+      <div class="px-4 text-xs text-gray-400 uppercase mt-6 mb-2">系统</div>
+      
+      <div class="sidebar-item">
+        <i class="fa fa-cog w-5 text-center"></i>
+        <span onclick="window.location.href='系统设置.html'">系统设置</span>
+      </div>
+      
+      <div class="sidebar-item" >
+        <i class="fa fa-user-circle w-5 text-center"></i>
+        <span onclick="window.location.href='page/个人中心.html'">个人中心</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- 主内容区 -->
+  <div class="flex-1 flex flex-col h-screen overflow-hidden">
+    <!-- 顶部导航栏 -->
+    <header class="bg-white h-16 border-b border-gray-200 flex items-center justify-between px-6 shadow-sm z-10">
+      <div class="flex items-center gap-4">
+        <button class="md:hidden text-gray-500 hover:text-primary" id="mobileSidebarToggle">
+          <i class="fa fa-bars text-xl"></i>
+        </button>
+        <div class="flex items-center gap-2">
+          <span class="text-gray-500">
+            <i class="fa fa-home"></i>
+          </span>
+          <span class="text-gray-500">/</span>
+          <span id="current-page-title">首页</span>
+        </div>
+      </div>
+      
+      <div class="flex items-center gap-6">
+        <div class="relative">
+          <input type="text" placeholder="搜索..." class="pl-9 pr-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary text-sm w-64">
+          <i class="fa fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+        </div>
+        
+        <button class="relative text-gray-500 hover:text-primary transition-colors">
+          <i class="fa fa-bell text-xl"></i>
+          <span class="absolute -top-1 -right-1 bg-danger text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">3</span>
+        </button>
+        
+        <div class="flex items-center gap-2 cursor-pointer group">
+          <img src="https://picsum.photos/id/1012/40/40" alt="用户头像" class="w-8 h-8 rounded-full object-cover border-2 border-transparent group-hover:border-primary transition-colors">
+          <span class="hidden md:inline">admin</span>
+          <i class="fa fa-angle-down text-gray-500 group-hover:text-primary transition-colors"></i>
+        </div>
+      </div>
+    </header>
+    
+    <!-- 页面内容 -->
+    <main class="flex-1 overflow-y-auto p-6">
+      <!-- 页面标题 -->
+      <div class="mb-6">
+        <h1 class="text-[clamp(1.5rem,3vw,2rem)] font-bold text-gray-800">首页</h1>
+        <p class="text-gray-500 mt-1">欢迎回来，admin！这是系统的主要数据概览</p>
+      </div>
+      
+      <!-- 数据统计卡片 -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+        <!-- 采购订单统计 -->
+        <div class="stat-card border-l-4 border-primary">
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="text-gray-500 text-sm">采购订单</p>
+              <h3 class="text-2xl font-bold mt-1">1,284</h3>
+              <p class="text-success text-sm mt-2 flex items-center">
+                <i class="fa fa-arrow-up mr-1"></i> 12.5% <span class="text-gray-500 ml-1">较上月</span>
+              </p>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+              <i class="fa fa-shopping-cart"></i>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 库存总量统计 -->
+        <div class="stat-card border-l-4 border-secondary">
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="text-gray-500 text-sm">库存总量</p>
+              <h3 class="text-2xl font-bold mt-1">3,752</h3>
+              <p class="text-danger text-sm mt-2 flex items-center">
+                <i class="fa fa-arrow-down mr-1"></i> 3.2% <span class="text-gray-500 ml-1">较上月</span>
+              </p>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center text-secondary">
+              <i class="fa fa-archive"></i>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 销售订单统计 -->
+        <div class="stat-card border-l-4 border-success">
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="text-gray-500 text-sm">销售订单</p>
+              <h3 class="text-2xl font-bold mt-1">2,456</h3>
+              <p class="text-success text-sm mt-2 flex items-center">
+                <i class="fa fa-arrow-up mr-1"></i> 8.7% <span class="text-gray-500 ml-1">较上月</span>
+              </p>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-success/10 flex items-center justify-center text-success">
+              <i class="fa fa-line-chart"></i>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 客户数量统计 -->
+        <div class="stat-card border-l-4 border-warning">
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="text-gray-500 text-sm">活跃客户</p>
+              <h3 class="text-2xl font-bold mt-1">892</h3>
+              <p class="text-success text-sm mt-2 flex items-center">
+                <i class="fa fa-arrow-up mr-1"></i> 5.3% <span class="text-gray-500 ml-1">较上月</span>
+              </p>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-warning/10 flex items-center justify-center text-warning">
+              <i class="fa fa-users"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 中间部分：图表和最近订单 -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        <!-- 图表区域 -->
+        <div class="lg:col-span-2 bg-white rounded-lg shadow-sm p-5">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="font-bold text-gray-800">业务趋势分析</h3>
+            <div class="flex gap-2">
+              <button class="px-3 py-1 text-sm bg-primary text-white rounded-md">月度</button>
+              <button class="px-3 py-1 text-sm bg-gray-100 text-gray-600 rounded-md hover:bg-gray-200 transition-colors">季度</button>
+              <button class="px-3 py-1 text-sm bg-gray-100 text-gray-600 rounded-md hover:bg-gray-200 transition-colors">年度</button>
+            </div>
+          </div>
+          <div class="h-80">
+            <canvas id="businessChart"></canvas>
+          </div>
+        </div>
+        
+        <!-- 最近订单 -->
+        <div class="bg-white rounded-lg shadow-sm p-5">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="font-bold text-gray-800">最近订单</h3>
+            <button class="text-primary text-sm hover:underline">查看全部</button>
+          </div>
+          
+          <div class="space-y-4 max-h-80 overflow-y-auto pr-2">
+            <!-- 订单1 -->
+            <div class="p-3 border border-gray-100 rounded-lg hover:border-primary/30 transition-colors">
+              <div class="flex justify-between items-start">
+                <div>
+                  <p class="text-sm font-medium">PO-2023-0572</p>
+                  <p class="text-xs text-gray-500 mt-1">2023-06-18</p>
+                </div>
+                <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">已下单</span>
+              </div>
+              <p class="text-sm mt-2">北京科技有限公司</p>
+              <p class="text-primary font-medium mt-2">¥18,200.00</p>
+            </div>
+            
+            <!-- 订单2 -->
+            <div class="p-3 border border-gray-100 rounded-lg hover:border-primary/30 transition-colors">
+              <div class="flex justify-between items-start">
+                <div>
+                  <p class="text-sm font-medium">PO-2023-0571</p>
+                  <p class="text-xs text-gray-500 mt-1">2023-06-17</p>
+                </div>
+                <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">已发货</span>
+              </div>
+              <p class="text-sm mt-2">广州电子有限公司</p>
+              <p class="text-primary font-medium mt-2">¥32,800.00</p>
+            </div>
+            
+            <!-- 订单3 -->
+            <div class="p-3 border border-gray-100 rounded-lg hover:border-primary/30 transition-colors">
+              <div class="flex justify-between items-start">
+                <div>
+                  <p class="text-sm font-medium">PO-2023-0570</p>
+                  <p class="text-xs text-gray-500 mt-1">2023-06-16</p>
+                </div>
+                <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">已完成</span>
+              </div>
+              <p class="text-sm mt-2">上海贸易公司</p>
+              <p class="text-primary font-medium mt-2">¥15,600.00</p>
+            </div>
+            
+            <!-- 订单4 -->
+            <div class="p-3 border border-gray-100 rounded-lg hover:border-primary/30 transition-colors">
+              <div class="flex justify-between items-start">
+                <div>
+                  <p class="text-sm font-medium">PO-2023-0569</p>
+                  <p class="text-xs text-gray-500 mt-1">2023-06-15</p>
+                </div>
+                <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">已完成</span>
+              </div>
+              <p class="text-sm mt-2">深圳科技有限公司</p>
+              <p class="text-primary font-medium mt-2">¥9,650.00</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 底部部分：最近订单列表和系统公告 -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- 最近订单列表 -->
+        <div class="lg:col-span-2 bg-white rounded-lg shadow-sm p-5">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="font-bold text-gray-800">订单管理</h3>
+            <button class="text-primary text-sm hover:underline">查看全部</button>
+          </div>
+          
+          <div class="overflow-x-auto">
+            <table class="min-w-full">
+              <thead>
+                <tr class="bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th class="px-3 py-3 rounded-l-lg">订单编号</th>
+                  <th class="px-3 py-3">类型</th>
+                  <th class="px-3 py-3">客户/供应商</th>
+                  <th class="px-3 py-3">金额</th>
+                  <th class="px-3 py-3">状态</th>
+                  <th class="px-3 py-3 rounded-r-lg">操作</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr class="hover:bg-gray-50 transition-colors">
+                  <td class="px-3 py-3 text-sm">PO-2023-0568</td>
+                  <td class="px-3 py-3 text-sm">采购订单</td>
+                  <td class="px-3 py-3 text-sm">北京科技有限公司</td>
+                  <td class="px-3 py-3 text-sm">¥25,600.00</td>
+                  <td class="px-3 py-3 text-sm">
+                    <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">已下单</span>
+                  </td>
+                  <td class="px-3 py-3 text-sm">
+                    <button class="text-primary hover:text-primary/80 mr-2">查看</button>
+                    <button class="text-gray-500 hover:text-gray-700">编辑</button>
+                  </td>
+                </tr>
+                <tr class="hover:bg-gray-50 transition-colors">
+                  <td class="px-3 py-3 text-sm">SO-2023-0892</td>
+                  <td class="px-3 py-3 text-sm">销售订单</td>
+                  <td class="px-3 py-3 text-sm">上海贸易公司</td>
+                  <td class="px-3 py-3 text-sm">¥18,450.00</td>
+                  <td class="px-3 py-3 text-sm">
+                    <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">已完成</span>
+                  </td>
+                  <td class="px-3 py-3 text-sm">
+                    <button class="text-primary hover:text-primary/80 mr-2">查看</button>
+                    <button class="text-gray-500 hover:text-gray-700">编辑</button>
+                  </td>
+                </tr>
+                <tr class="hover:bg-gray-50 transition-colors">
+                  <td class="px-3 py-3 text-sm">PO-2023-0569</td>
+                  <td class="px-3 py-3 text-sm">采购订单</td>
+                  <td class="px-3 py-3 text-sm">广州电子有限公司</td>
+                  <td class="px-3 py-3 text-sm">¥32,800.00</td>
+                  <td class="px-3 py-3 text-sm">
+                    <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">已发货</span>
+                  </td>
+                  <td class="px-3 py-3 text-sm">
+                    <button class="text-primary hover:text-primary/80 mr-2">查看</button>
+                    <button class="text-gray-500 hover:text-gray-700">编辑</button>
+                  </td>
+                </tr>
+                <tr class="hover:bg-gray-50 transition-colors">
+                  <td class="px-3 py-3 text-sm">SO-2023-0893</td>
+                  <td class="px-3 py-3 text-sm">销售订单</td>
+                  <td class="px-3 py-3 text-sm">深圳科技有限公司</td>
+                  <td class="px-3 py-3 text-sm">¥9,650.00</td>
+                  <td class="px-3 py-3 text-sm">
+                    <span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">已取消</span>
+                  </td>
+                  <td class="px-3 py-3 text-sm">
+                    <button class="text-primary hover:text-primary/80 mr-2">查看</button>
+                    <button class="text-gray-500 hover:text-gray-700">编辑</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        
+        <!-- 系统公告和版本信息 -->
+        <div class="flex flex-col gap-6">
+          <!-- 系统公告 -->
+          <div class="bg-white rounded-lg shadow-sm p-5">
+            <h3 class="font-bold text-gray-800 mb-4">系统公告</h3>
+            <div class="space-y-1 max-h-60 overflow-y-auto pr-2">
+              <div class="announcement-item">
+                <p class="font-medium text-sm">系统将于本周日进行维护升级</p>
+                <p class="text-gray-500 text-xs mt-1">2023-06-15 09:30</p>
+              </div>
+              <div class="announcement-item">
+                <p class="font-medium text-sm">新增采购订单批量导入功能</p>
+                <p class="text-gray-500 text-xs mt-1">2023-06-10 14:20</p>
+              </div>
+              <div class="announcement-item">
+                <p class="font-medium text-sm">库存预警阈值设置功能已上线</p>
+                <p class="text-gray-500 text-xs mt-1">2023-06-05 16:45</p>
+              </div>
+              <div class="announcement-item">
+                <p class="font-medium text-sm">销售报表功能优化完成</p>
+                <p class="text-gray-500 text-xs mt-1">2023-05-28 10:15</p>
+              </div>
+              <div class="announcement-item">
+                <p class="font-medium text-sm">请及时更新浏览器至最新版本</p>
+                <p class="text-gray-500 text-xs mt-1">2023-05-20 11:30</p>
+              </div>
+            </div>
+            <button class="w-full mt-4 py-2 text-center text-primary text-sm hover:bg-primary/5 rounded-md transition-colors">
+              查看全部公告
+            </button>
+          </div>
+          
+          <!-- 版本信息 -->
+          <div class="bg-white rounded-lg shadow-sm p-5">
+            <h3 class="font-bold text-gray-800 mb-4">版本信息</h3>
+            <div class="space-y-3 text-sm">
+              <div class="flex justify-between">
+                <span class="text-gray-500">系统名称</span>
+                <span>企业资源管理系统</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-500">当前版本</span>
+                <span class="text-primary">v3.2.0</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-500">主要特点</span>
+                <span>高效/稳定/安全</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-500">最近更新</span>
+                <span>2023-06-01</span>
+              </div>
+              <div class="pt-2 border-t border-gray-100">
+                <button class="text-primary hover:underline">检查更新</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    // 侧边栏折叠/展开功能
+    document.querySelectorAll('.sidebar-item').forEach(item => {
+      // 只给有子菜单的项添加点击事件
+      if (item.querySelector('.fa-angle-down')) {
+        item.addEventListener('click', function() {
+          const submenu = this.nextElementSibling;
+          const icon = this.querySelector('.fa-angle-down');
+          
+          // 切换子菜单显示状态
+          if (submenu && submenu.classList.contains('hidden')) {
+            submenu.classList.remove('hidden');
+            icon.classList.add('rotate-180');
+          } else if (submenu) {
+            submenu.classList.add('hidden');
+            icon.classList.remove('rotate-180');
+          }
+        });
+      }
+    });
+    
+    // 业务趋势图表
+    const ctx = document.getElementById('businessChart').getContext('2d');
+    const businessChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
+        datasets: [
+          {
+            label: '采购金额',
+            data: [8500, 9200, 8800, 10500, 11200, 12800, 13500, 12900, 14200, 15600, 14800, 16500],
+            borderColor: '#165DFF',
+            backgroundColor: 'rgba(22, 93, 255, 0.1)',
+            tension: 0.4,
+            fill: false
+          },
+          {
+            label: '销售金额',
+            data: [12500, 13200, 14800, 15500, 16200, 17800, 16500, 18200, 19500, 20800, 21500, 23200],
+            borderColor: '#00B42A',
+            backgroundColor: 'rgba(0, 180, 42, 0.1)',
+            tension: 0.4,
+            fill: false
+          },
+          {
+            label: '库存总量',
+            data: [3200, 3100, 3300, 3500, 3400, 3700, 3600, 3800, 3750, 3900, 3850, 4000],
+            borderColor: '#0FC6C2',
+            backgroundColor: 'rgba(15, 198, 194, 0.1)',
+            tension: 0.4,
+            fill: false
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'top',
+          },
+          tooltip: {
+            mode: 'index',
+            intersect: false,
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            grid: {
+              color: 'rgba(0, 0, 0, 0.05)'
+            }
+          },
+          x: {
+            grid: {
+              display: false
+            }
+          }
+        },
+        interaction: {
+          mode: 'nearest',
+          axis: 'x',
+          intersect: false
+        }
+      }
+    });
+    
+    // 移动端侧边栏切换
+    document.getElementById('mobileSidebarToggle').addEventListener('click', function() {
+      const sidebar = document.querySelector('aside');
+      sidebar.classList.toggle('hidden');
+      sidebar.classList.toggle('fixed');
+      sidebar.classList.toggle('inset-y-0');
+      sidebar.classList.toggle('left-0');
+      
+      // 点击侧边栏外部关闭侧边栏
+      if (!sidebar.classList.contains('hidden')) {
+        const overlay = document.createElement('div');
+        overlay.className = 'fixed inset-0 bg-black bg-opacity-50 z-10 md:hidden';
+        overlay.id = 'sidebarOverlay';
+        document.body.appendChild(overlay);
+        
+        overlay.addEventListener('click', function() {
+          sidebar.classList.add('hidden');
+          sidebar.classList.remove('fixed', 'inset-y-0', 'left-0');
+          document.body.removeChild(overlay);
+        });
+      } else {
+        const overlay = document.getElementById('sidebarOverlay');
+        if (overlay) {
+          document.body.removeChild(overlay);
+        }
+      }
+    });
+
+    // 确保页面内容可以滚动
+    document.addEventListener('DOMContentLoaded', function() {
+      // 移除可能导致滚动问题的样式
+      document.body.style.overflow = '';
+      
+      // 确保主内容区域正确设置滚动
+      const mainContent = document.querySelector('main');
+      if (mainContent) {
+        mainContent.style.overflowY = 'auto';
+        // 添加一些内边距防止内容被底部遮挡
+        mainContent.style.paddingBottom = '2rem';
+      }
+    });
+  </script>
+</body>
+</html>

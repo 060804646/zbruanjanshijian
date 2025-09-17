@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>库存预警</title>
+<style>
+    body{font-family:"微软雅黑";background:#f5f5f5;margin:0;padding:20px}
+    .box{width:650px;margin:0 auto;background:#fff;padding:20px;border:1px solid #ddd}
+    h2{margin:0 0 10px;font-size:18px}
+    .s{margin-bottom:10px}
+    .s input{padding:5px;width:150px;margin-right:5px;border:1px solid #ccc}
+    .s button{padding:5px 10px;background:#2c7eda;color:#fff;border:none;cursor:pointer;margin-right:5px}
+    table{width:100%;border-collapse:collapse;font-size:14px}
+    th,td{border:1px solid #ddd;padding:6px;text-align:center}
+    th{background:#f0f0f0}
+    .r{color:red}
+    .y{color:#d68900}
+    .g{color:green}
+    .btn{padding:2px 6px;font-size:12px;cursor:pointer}
+    .btn-edit{background:#5cb85c;color:#fff;border:none}
+</style>
+</head>
+<body>
+<div class="box">
+    <h2>库存预警</h2>
+    <div class="s">
+        商品：<input type="text" id="key" placeholder="名称/编码">
+        <button onclick="sel()">查询</button>
+        <button onclick="all()">显示全部</button>
+    </div>
+    <table id="t">
+        <thead>
+            <tr><th>编码</th><th>名称</th><th>当前库存</th><th>预警线</th><th>缺口</th><th>级别</th><th>操作</th></tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<script>
+// 简单数据
+var data = [
+    {code:"P001",name:"台式电脑",qty:5,threshold:10},
+    {code:"P002",name:"激光打印机",qty:3,threshold:5},
+    {code:"P003",name:"无线鼠标",qty:180,threshold:50}
+];
+
+// 计算缺口和级别
+for(var i=0;i<data.length;i++){
+    var d=data[i];
+    d.gap=d.threshold-d.qty;
+    if(d.gap>0){
+        d.level=d.gap>=10?"高":d.gap>=5?"中":"低";
+    }else{
+        d.level="正常";
+    }
+}
+
+// 显示全部
+function all(){
+    show(data);
+}
+
+// 查询
+function sel(){
+    var k=document.getElementById("key").value.trim().toLowerCase();
+    if(k===""){alert("请输入关键词");return;}
+    var arr=[];
+    for(var i=0;i<data.length;i++){
+        var d=data[i];
+        if(d.code.toLowerCase().indexOf(k)!==-1||d.name.toLowerCase().indexOf(k)!==-1){
+            arr.push(d);
+        }
+    }
+    if(arr.length===0){alert("没找到");return;}
+    show(arr);
+}
+
+// 渲染表格
+function show(list){
+    var tb=document.querySelector("#t tbody");
+    tb.innerHTML="";
+    for(var i=0;i<list.length;i++){
+        var d=list[i];
+        if(d.level==="正常") continue; // 只显示预警行
+        var tr=document.createElement("tr");
+        tr.innerHTML="<td>"+d.code+"</td><td>"+d.name+"</td><td>"+d.qty+"</td><td>"+d.threshold+"</td><td>"+d.gap+"</td><td class='"+(d.level==="高"?"r":d.level==="中"?"y":"g")+"'>"+d.level+"</td><td><button class='btn btn-edit' onclick='editThreshold(\""+d.code+"\")'>改阈值</button></td>";
+        tb.appendChild(tr);
+    }
+}
+
+// 修改阈值
+function editThreshold(code){
+    var item=null;
+    for(var i=0;i<data.length;i++){
+        if(data[i].code===code){item=data[i];break;}
+    }
+    if(!item){return;}
+    var newVal=prompt("请为 "+item.name+" 设置新的预警阈值：",item.threshold);
+    if(newVal===null||newVal===""){return;}
+    newVal=parseInt(newVal);
+    if(isNaN(newVal)||newVal<0){alert("请输入有效数字");return;}
+    item.threshold=newVal;
+    // 重新计算
+    item.gap=item.threshold-item.qty;
+    if(item.gap>0){
+        item.level=item.gap>=10?"高":item.gap>=5?"中":"低";
+    }else{
+        item.level="正常";
+    }
+    all(); // 刷新
+}
+
+// 初始加载
+all();
+</script>
+</body>
+</html>

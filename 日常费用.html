@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>日常费用</title>
+<style>
+    body{font-family:"微软雅黑";background:#f5f5f5;margin:0;padding:20px}
+    .box{width:700px;margin:0 auto;background:#fff;padding:20px;border:1px solid #ddd}
+    h2{margin:0 0 10px;font-size:18px}
+    .row{margin-bottom:8px;font-size:14px}
+    .row label{display:inline-block;width:100px;text-align:right;margin-right:6px}
+    .row input{padding:5px;border:1px solid #ccc;width:160px}
+    .row select{padding:5px;border:1px solid #ccc;width:160px}
+    table{width:100%;border-collapse:collapse;font-size:14px;margin-top:10px}
+    th,td{border:1px solid #ddd;padding:6px;text-align:center}
+    th{background:#f0f0f0}
+    .btn-add{padding:4px 10px;background:#2c7eda;color:#fff;border:none;cursor:pointer;font-size:12px}
+    .btn-save{padding:6px 20px;background:#5cb85c;color:#fff;border:none;cursor:pointer;margin-top:10px}
+    .short{width:80px}
+    .table-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+</style>
+</head>
+<body>
+<div class="box">
+    <h2>日常费用</h2>
+    <form id="expenseForm" onsubmit="return saveExpense()">
+        <div class="row">
+            <label>年份：</label>
+            <select id="year" required></select>
+            <label>季度：</label>
+            <select id="quarter" required>
+                <option value="">请选择</option>
+                <option>Q1</option>
+                <option>Q2</option>
+                <option>Q3</option>
+                <option>Q4</option>
+            </select>
+        </div>
+
+        <!-- 费用明细 -->
+        <div class="table-header">
+            <div></div>
+            <button type="button" class="btn-add" onclick="addExpense()">添加费用</button>
+        </div>
+        <table id="expenseTable">
+            <thead>
+                <tr><th>费用类型</th><th>金额(元)</th><th>日期</th><th>备注</th><th>操作</th></tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+        <button type="submit" class="btn-save">保存费用</button>
+    </form>
+</div>
+
+<script>
+// 填充年份下拉框
+var yearSel = document.getElementById("year");
+for(var y = 2020; y <= 2030; y++){
+    var op = document.createElement("option");
+    op.value = y;
+    op.text = y;
+    if(y == new Date().getFullYear()) op.selected = true;
+    yearSel.appendChild(op);
+}
+
+// 添加费用行
+function addExpense(){
+    var tbody = document.querySelector("#expenseTable tbody");
+    var row = document.createElement("tr");
+    row.innerHTML = 
+        '<td><select name="type" required>'+
+        '<option value="">请选择</option>'+
+        '<option>季度水电费</option>'+
+        '<option>设备维修费</option>'+
+        '<option>员工工资</option>'+
+        '</select></td>'+
+        '<td><input type="number" step="0.01" min="0" name="amount" class="short" required></td>'+
+        '<td><input type="date" name="date" class="short" required></td>'+
+        '<td><input type="text" name="remark"></td>'+
+        '<td><button type="button" class="btn-del" onclick="delRow(this)">删除</button></td>';
+    tbody.appendChild(row);
+}
+
+// 删除行
+function delRow(btn){
+    btn.parentNode.parentNode.remove();
+}
+
+// 保存费用
+function saveExpense(){
+    var year = document.getElementById("year").value;
+    var quarter = document.getElementById("quarter").value;
+
+    if(!quarter){alert("请选择季度");return false;}
+
+    var expenses = [];
+    var rows = document.querySelectorAll("#expenseTable tbody tr");
+    for(var i=0;i<rows.length;i++){
+        var cells = rows[i].querySelectorAll("select,input");
+        if(!cells[0].value||!cells[1].value||!cells[2].value){alert("请填写完整费用信息");return false;}
+        expenses.push({
+            type: cells[0].value,
+            amount: cells[1].value,
+            date: cells[2].value,
+            remark: cells[3].value
+        });
+    }
+
+    var result = {
+        year: year,
+        quarter: quarter,
+        expenses: expenses
+    };
+    console.log(result);
+    alert("日常费用已保存！\n"+JSON.stringify(result,null,4));
+    return false;
+}
+</script>
+</body>
+</html>

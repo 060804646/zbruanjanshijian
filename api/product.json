@@ -1,0 +1,107 @@
+{
+  "code": 0,
+  "msg": "",
+  "count": 1000,
+  "data": [
+    {
+      "productId": 10000,
+	  "productName":"pro-0",
+      "specification": "件",
+      "category": "食品饮料类",
+      "costPrice": "5元",
+      "sellingPrice": "10元",
+      "profit": "5元",
+      "supplier": "供应商-0"
+    },
+    {
+      "productId": 10001,
+      "productName": "pro-1",
+      "specification": "箱",
+      "category": "食品饮料类",
+      "costPrice": "70元",
+      "sellingPrice": "100元",
+      "profit": "30元",
+      "supplier": "供应商-1"
+    },
+    {
+      "productId": 10002,
+      "productName": "pro-2",
+      "specification": "件",
+      "category": "家居生活类",
+      "costPrice": "500元",
+      "sellingPrice": "700元",
+      "profit": "200元",
+      "supplier": "供应商-2"
+    },
+    {
+      "productId": 10003,
+      "productName": "pro-3",
+      "specification": "件",
+      "category": "食品饮料类",
+      "costPrice": "7元",
+      "sellingPrice": "13元",
+      "profit": "6元",
+      "supplier": "供应商-3"
+    },
+    {
+      "productId": 10004,
+      "productName": "pro-4",
+      "specification": "个",
+      "category": "美妆护肤类",
+      "costPrice": "500元",
+      "sellingPrice": "900元",
+      "profit": "400元",
+      "supplier": "供应商-4"
+    },
+    {
+      "productId": 10005,
+      "productName": "pro-5",
+      "specification": "套",
+      "category": "美妆护肤类",
+      "costPrice": "700元",
+      "sellingPrice": "1000元",
+      "profit": "300元",
+      "supplier": "供应商-5"
+    },
+    {
+      "productId": 10006,
+      "productName": "pro-6",
+      "specification": "袋",
+      "category": "食品饮料类",
+      "costPrice": "50元",
+      "sellingPrice": "70元",
+      "profit": "20元",
+      "supplier": "供应商-6"
+    },
+    {
+      "productId": 10007,
+      "productName": "pro-7",
+      "specification": "本",
+      "category": "图书文娱类",
+      "costPrice": "40元",
+      "sellingPrice": "50元",
+      "profit": "10元",
+      "supplier": "供应商-7"
+    },
+    {
+      "productId": 10008,
+      "productName": "pro-8",
+      "specification": "册",
+      "category": "图书文娱类",
+      "costPrice": "100元",
+      "sellingPrice": "150元",
+      "profit": "50元",
+      "supplier": "供应商-8"
+    },
+    {
+      "productId": 10009,
+      "productName": "pro-9",
+      "specification": "件",
+      "category": "食品饮料类",
+      "costPrice": "9元",
+      "sellingPrice": "10元",
+      "profit": "1元",
+      "supplier": "供应商-9"
+    }
+  ]
+}

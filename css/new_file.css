@@ -1,0 +1,6 @@
+.page-section{
+	@apply hidden;
+}
+.page-section.active{
+	@apply block;
+}

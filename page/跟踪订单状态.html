@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>订单跟踪</title>
+    <style>
+        body{font-family:"微软雅黑";background:#f5f5f5;margin:0;padding:20px}
+        .box{width:800px;margin:0 auto;background:#fff;padding:20px;border:1px solid #ddd}
+        h2{margin:0 0 15px;font-size:20px;color:#333}
+        .search{margin-bottom:15px}
+        .search input, .search select{padding:6px;margin-right:8px;border:1px solid #ccc}
+        .search button{padding:6px 12px;background:#2c7eda;color:#fff;border:none;cursor:pointer}
+        table{width:100%;border-collapse:collapse;font-size:14px}
+        th,td{border:1px solid #ddd;padding:8px;text-align:center}
+        th{background:#f0f0f0}
+        .btn{padding:3px 8px;font-size:12px;margin:0 2px;cursor:pointer;border:none}
+        .btn-info{background:#5bc0de;color:#fff}
+        .btn-success{background:#5cb85c;color:#fff}
+        .status-pending{color:#888}
+        .status-ordered{color:#2c7eda}
+        .status-received{color:#5cb85c}
+    </style>
+</head>
+<body>
+<div class="box">
+    <h2>订单状态跟踪</h2>
+    <div class="search">
+        订单号：<input type="text" id="sOrder" />
+        供应商：
+        <input id="sSupp">
+        状态：
+        <select id="sStatus">
+            <option value="">全部</option>
+            <option>待审核</option>
+            <option>已下单</option>
+            <option>已到货</option>
+        </select>
+        <button onclick="search()">搜索</button>
+    </div>
+
+    <table id="orderTable">
+        <thead>
+        <tr>
+            <th>订单编号</th>
+            <th>供应商</th>
+            <th>订单日期</th>
+            <th>到货时间</th>
+            <th>金额</th>
+            <th>状态</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>PO-2024-001</td>
+            <td>北京科技</td>
+            <td>2024-06-15</td>
+            <td>2024-06-22</td>
+            <td>¥18,200</td>
+            <td class="status-received">已到货</td>
+            <td>
+                <button class="btn btn-info" onclick="viewDetail(this)">查看</button>
+                <button class="btn btn-success" onclick="changeStatus(this)">更新</button>
+            </td>
+        </tr>
+        <tr>
+            <td>PO-2024-002</td>
+            <td>广州电子</td>
+            <td>2024-06-16</td>
+            <td>2024-06-23</td>
+            <td>¥32,800</td>
+            <td class="status-ordered">已下单</td>
+            <td>
+                <button class="btn btn-info" onclick="viewDetail(this)">查看</button>
+                <button class="btn btn-success" onclick="changeStatus(this)">更新</button>
+            </td>
+        </tr>
+        <tr>
+            <td>PO-2024-003</td>
+            <td>上海贸易</td>
+            <td>2024-06-17</td>
+            <td>2024-06-24</td>
+            <td>¥15,600</td>
+            <td class="status-pending">待审核</td>
+            <td>
+                <button class="btn btn-info" onclick="viewDetail(this)">查看</button>
+                <button class="btn btn-success" onclick="changeStatus(this)">更新</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+// 查看详情
+function viewDetail(btn){
+    var row = btn.parentNode.parentNode;
+    var id = row.cells[0].innerText;
+    alert('查看订单 ' + id + ' 的详细信息');
+}
+
+// 更新状态
+function changeStatus(btn){
+    var row = btn.parentNode.parentNode;
+    var statusCell = row.cells[5];
+    var cur = statusCell.innerText;
+    var next = "";
+    if(cur === "待审核") next = "已下单";
+    else if(cur === "已下单") next = "已到货";
+    else { alert("订单已完成！"); return; }
+
+    if(confirm("确定改为“" + next + "”？")){
+        statusCell.innerText = next;
+        statusCell.className = next === "已到货" ? "status-received" : "status-ordered";
+    }
+}
+
+// 简单搜索
+function search(){
+    var so = document.getElementById("sOrder").value.trim().toLowerCase();
+    var ss = document.getElementById("sSupp").value;
+    var st = document.getElementById("sStatus").value;
+    var tb = document.getElementById("orderTable").tBodies[0];
+    var trs = tb.rows;
+    for(var i = 0; i < trs.length; i++){
+        var tds = trs[i].cells;
+        var ok = true;
+        if(so && !tds[0].innerText.toLowerCase().includes(so)) ok = false;
+        if(ss && tds[1].innerText !== ss) ok = false;
+        if(st && tds[5].innerText !== st) ok = false;
+        trs[i].style.display = ok ? "" : "none";
+    }
+}
+</script>
+</body>
+</html>

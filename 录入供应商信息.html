@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-UTF-8">
+    <title>录入供应商信息</title>
+    <style>
+        body{
+            font-family:"微软雅黑";
+            background:#f5f5f5;
+            margin:0;
+            padding:20px;
+        }
+        .box{
+            width:800px;
+            margin:0 auto;
+            background:#fff;
+            padding:20px;
+            border:1px solid #ddd;
+        }
+        h2{
+            margin:0 0 15px;
+            font-size:20px;
+            color:#333;
+        }
+        .form-row{
+            margin-bottom:15px;
+        }
+        .form-row label{
+            display:inline-block;
+            width:100px;
+            text-align:right;
+            margin-right:8px;
+            font-size:14px;
+        }
+        .form-row input,.form-row select,.form-row textarea{
+            padding:6px;
+            border:1px solid #ccc;
+            width:250px;
+        }
+        .form-row textarea{
+            vertical-align:top;
+            height:60px;
+        }
+        .btn-save{
+            padding:8px 20px;
+            background:#2c7eda;
+            color:#fff;
+            border:none;
+            cursor:pointer;
+            margin-left:108px;
+        }
+        .btn-save:hover{
+            background:#236bb0;
+        }
+        .required::after{
+            content:" *";
+            color:red;
+        }
+    </style>
+</head>
+<body>
+<div class="box">
+    <h2>录入供应商信息</h2>
+    <form id="supplierForm" onsubmit="return saveSupplier()">
+        <div class="form-row">
+            <label class="required">供应商名称：</label>
+            <input type="text" name="name" required>
+        </div>
+        <div class="form-row">
+            <label class="required">联系人：</label>
+            <input type="text" name="contact" required>
+        </div>
+        <div class="form-row">
+            <label class="required">联系电话：</label>
+            <input type="text" name="phone" required>
+        </div>
+        <div class="form-row">
+            <label class="required">供应地址：</label>
+            <textarea name="address" required></textarea>
+        </div>
+        <div class="form-row">
+            <label class="required">结算方式：</label>
+            <select name="payment" required>
+                <option value="">请选择</option>
+                <option>现结</option>
+                <option>月结</option>
+                <option>季结</option>
+                <option>年结</option>
+            </select>
+        </div>
+        <div class="form-row">
+            <label>备注：</label>
+            <textarea name="remark"></textarea>
+        </div>
+        <div class="form-row">
+            <button type="submit" class="btn-save">保存供应商信息</button>
+        </div>
+    </form>
+</div>
+
+<script>
+function saveSupplier(){
+    var form=document.getElementById("supplierForm");
+    var data={
+        名称: form.name.value,
+        联系人: form.contact.value,
+        电话: form.phone.value,
+        地址: form.address.value,
+        结算方式: form.payment.value,
+        备注: form.remark.value
+    };
+    console.log(data);
+    alert("供应商信息已保存！\n"+JSON.stringify(data,null,4));
+    return false;
+}
+</script>
+</body>
+</html>
